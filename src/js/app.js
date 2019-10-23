@@ -39,15 +39,16 @@ App = {
   bindEvents: function() {
 	$(document).on('click', '#transferButton', App.handleTransfer);
 	$(document).on('click', '#getPay', App.handleget);
+	$(document).on('click', '#coin_destroy', App.handledestory);
   },
   
-  handleget: function(event) {
-	event.preventDefault();
+  handledestory: function(event) {
+    event.preventDefault();
 
     var amount = parseInt($('#TTTransferAmount').val());
     var toAddress = $('#TTTransferAddress').val();
 
-    console.log('Transfer ' + amount + ' TT to ' + toAddress);
+    console.log('Burn ' + amount + ' JYS ' );
 
     var tutorialTokenInstance;
 
@@ -61,7 +62,38 @@ App = {
       App.contracts.TutorialToken.deployed().then(function(instance) {
         tutorialTokenInstance = instance;
 
-        return tutorialTokenInstance.mint(toAddress, amount, {from: account, gas: 100000});
+        return tutorialTokenInstance.burn(toAddress, amount, {from: account, gas: 100000});
+      }).then(function(result) {
+        alert('Transfer Successful!');
+        return App.getBalances();
+      }).catch(function(err) {
+        console.log(err.message);
+      });
+    });
+  },
+  
+  
+  handleget: function(event) {
+	event.preventDefault();
+
+    var amount = parseInt($('#TTTransferAmount').val());
+    var toAddress = $('#TTTransferAddress').val();
+
+    console.log('Get ' + amount + ' JYS ');
+
+    var tutorialTokenInstance;
+
+    web3.eth.getAccounts(function(error, accounts) {
+      if (error) {
+        console.log(error);
+      }
+
+      var account = accounts[0];
+
+      App.contracts.TutorialToken.deployed().then(function(instance) {
+        tutorialTokenInstance = instance;
+
+        return tutorialTokenInstance.mint(toAddress, amount, {from: account, gas: 100000, value:String(Number(1000000000000000)*amount)});
       }).then(function(result) {
         alert('Transfer Successful!');
         return App.getBalances();

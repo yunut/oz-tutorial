@@ -14,8 +14,13 @@ contract TutorialToken is ERC20 {
 		_mint(address(0xd77Ba6369a6df14D66dC63A95e1Ff9CeA54C5946), INITIAL_SUPPLY);
 	}
 	
-	function mint(address _receive, uint amount) public{
-		require(manager == msg.sender);
+	function mint(address _receive, uint amount) public payable {
+		require(amount*0.001 ether == msg.value);	
 		_mint(_receive,amount);
+	}
+	
+	function burn(address _receive, uint _value) public payable{
+		_burn(msg.sender, _value);
+		msg.sender.transfer(_value *0.001 ether);
 	}
 }
